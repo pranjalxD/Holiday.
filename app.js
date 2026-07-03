@@ -22,6 +22,7 @@ const Passport = require(`passport`);
 const LocalStrategy = require(`passport-local`);
 const User = require(`./models/user.js`);
 const dbURL = process.env.ATLASMONGO_URL;
+const PORT = process.env.PORT || 8080;
 
 const store = MongoStore.create({
   mongoUrl: dbURL,
@@ -32,7 +33,7 @@ const store = MongoStore.create({
 });
 
 store.on("error", () => {
-  console.log("Error occured in Mongo Atlas.", err);
+  console.log("MongoStore Error", err);
 });
 
 const sessionOptions = {
@@ -117,10 +118,11 @@ app.use("/", userRouter);
 //   next(new ExpressError(404, "Page not found"));
 // });
 app.use((err, req, res, next) => {
-  const { status = 404, message = "Something went wrong" } = err;
+  console.error("Original error:", err);
+  const { status = 500, message = "Something went wrong" } = err;
   res.status(status).render("listings/error.ejs", { message });
 });
 
-app.listen(8080, () => {
-  console.log(`app is listening on port 8080`);
+app.listen(PORT, () => {
+  console.log(`app is listening on port ${PORT}`);
 });
